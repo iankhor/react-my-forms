@@ -28,42 +28,42 @@ describe('password validation', () => {
 				render(<App />)
 
 				const passwordField = screen.getByRole('textbox', { name: 'Password' })
-				expect(screen.getByText('Error')).not.toBeVisible()
+				expect(screen.getByRole('alert', { hidden: true })).not.toBeVisible()
 				userEvent.type(passwordField, 'password!123')
 
 				expect(passwordField).toBeRequired()
 				expect(passwordField).toBeValid()
 				expect(passwordField).toHaveValue('password!123')
-				expect(screen.getByText('Error')).not.toBeVisible()
+				expect(screen.getByRole('alert', { hidden: true })).not.toBeVisible()
 			})
 
 			describe('with values less than 5 characters', () => {
-				it('fills password field', () => {
+				it('shows too short error', () => {
 					render(<App />)
 
 					const passwordField = screen.getByRole('textbox', { name: 'Password' })
-					expect(screen.getByText('Error')).not.toBeVisible()
+					expect(screen.getByRole('alert', { hidden: true })).not.toBeVisible()
 					userEvent.type(passwordField, '123')
 					fireEvent.blur(passwordField)
 
-					expect(screen.getByText('Error')).toBeVisible()
+					expect(screen.getByText('is too short')).toBeVisible()
 				})
 			})
 		})
 
 		describe('without values', () => {
-			it('shows required error', () => {
+			it('shows is blank error', () => {
 				render(<App />)
 
 				const passwordField = screen.getByRole('textbox', { name: 'Password' })
-				expect(screen.getByText('Error')).not.toBeVisible()
+				expect(screen.getByRole('alert', { hidden: true })).not.toBeVisible()
 				userEvent.type(passwordField, ' ')
 				fireEvent.blur(passwordField)
 
 				expect(passwordField).toBeRequired()
 				expect(passwordField).toBeInvalid()
 				expect(passwordField).toHaveValue('')
-				expect(screen.getByText('Error')).toBeVisible()
+				expect(screen.getByText('cannot be blank')).toBeVisible()
 			})
 		})
 	})
