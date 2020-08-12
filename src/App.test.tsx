@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import App from './App'
 
@@ -36,6 +36,19 @@ describe('password validation', () => {
 				expect(passwordField).toHaveValue('password!123')
 				expect(screen.getByText('Error')).not.toBeVisible()
 			})
+
+			describe('with values less than 5 characters', () => {
+				it('fills password field', () => {
+					render(<App />)
+
+					const passwordField = screen.getByRole('textbox', { name: 'Password' })
+					expect(screen.getByText('Error')).not.toBeVisible()
+					userEvent.type(passwordField, '123')
+					fireEvent.blur(passwordField)
+
+					expect(screen.getByText('Error')).toBeVisible()
+				})
+			})
 		})
 
 		describe('without values', () => {
@@ -45,6 +58,7 @@ describe('password validation', () => {
 				const passwordField = screen.getByRole('textbox', { name: 'Password' })
 				expect(screen.getByText('Error')).not.toBeVisible()
 				userEvent.type(passwordField, ' ')
+				fireEvent.blur(passwordField)
 
 				expect(passwordField).toBeRequired()
 				expect(passwordField).toBeInvalid()
