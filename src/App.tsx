@@ -1,23 +1,38 @@
-import React from 'react'
-import logo from './logo.svg'
+import React, { useState, ChangeEvent } from 'react'
 import './App.css'
 
-function App() {
+function isFieldError(value: string | null): boolean {
+	return value === ''
+}
+
+export default function App() {
+	const [password, setPassword] = useState<string | null>(null)
+
 	return (
 		<div className="App">
 			<form>
 				<label>
 					Password
-					<input />
+					<input
+						value={password || ''}
+						required
+						onChange={(e: ChangeEvent<HTMLInputElement>) => {
+							setPassword(e.target.value.trim())
+						}}
+						onBlur={(e: ChangeEvent<HTMLInputElement>) => {
+							setPassword(e.target.value.trim())
+						}}
+					/>
 				</label>
+				<div role="alert" style={{ display: isFieldError(password) ? '' : 'none' }}>
+					Error
+				</div>
 
 				<label>
 					Confirm password
-					<input />
+					<input value="" onChange={() => {}} />
 				</label>
 			</form>
 		</div>
 	)
 }
-
-export default App
