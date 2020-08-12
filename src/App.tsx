@@ -1,12 +1,33 @@
-import React, { useState, ChangeEvent } from 'react'
+import React, { ChangeEvent, useReducer } from 'react'
 import './App.css'
+
+type FormState = {
+	password?: string | null
+}
+
+type Action = {
+	type: 'change'
+	property: keyof FormState
+	value: any
+}
+
+const initFormState = {
+	password: null,
+}
+
+function reducer(state: FormState, action: Action) {
+	switch (action.type) {
+		case 'change':
+			return { ...state, [action.property]: action.value }
+	}
+}
 
 function isFieldError(value: string | null): boolean {
 	return value === ''
 }
 
 export default function App() {
-	const [password, setPassword] = useState<string | null>(null)
+	const [state, dispatch] = useReducer(reducer, initFormState)
 
 	return (
 		<div className="App">
@@ -14,17 +35,17 @@ export default function App() {
 				<label>
 					Password
 					<input
-						value={password || ''}
+						value={state.password || ''}
 						required
 						onChange={(e: ChangeEvent<HTMLInputElement>) => {
-							setPassword(e.target.value.trim())
+							dispatch({ type: 'change', property: 'password', value: e.target.value.trim() })
 						}}
 						onBlur={(e: ChangeEvent<HTMLInputElement>) => {
-							setPassword(e.target.value.trim())
+							dispatch({ type: 'change', property: 'password', value: e.target.value.trim() })
 						}}
 					/>
 				</label>
-				<div role="alert" style={{ display: isFieldError(password) ? '' : 'none' }}>
+				<div role="alert" style={{ display: isFieldError(state.password) ? '' : 'none' }}>
 					Error
 				</div>
 
