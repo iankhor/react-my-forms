@@ -1,4 +1,4 @@
-import React, { useMemo, useState, ChangeEvent, useReducer, useEffect } from 'react'
+import React, { useMemo, useState, ChangeEvent, useReducer } from 'react'
 import './App.css'
 
 type Form = {
@@ -24,7 +24,7 @@ type Action =
       value: any
     }
   | {
-      type: 'submit'
+      type: 'submit_errors'
       errors: any
     }
 
@@ -43,7 +43,7 @@ function reducer(state: FormState, action: Action) {
       const newState = { ...state, [action.property]: action.value.trim() }
       return { ...newState, errors: { ...validateFields(newState) } }
     }
-    case 'submit': {
+    case 'submit_errors': {
       return {
         ...state,
         errors: { ...action.errors },
@@ -92,7 +92,11 @@ function isValid(state: FormState): any {
 
 const useSimulatedSubmitServer = () => {
   const [isReturnResponse, setIsReturnResponse] = useState<boolean>(false)
-  const error = useMemo(() => generateError(), [isReturnResponse])
+  const error = useMemo(() => generateError(), [])
+
+  const response = isReturnResponse ? { password: error } : null
+
+  console.log('sent server error:', response)
 
   const reset = () => setIsReturnResponse(false)
 
@@ -105,9 +109,14 @@ export default function App() {
   const [state, dispatch] = useReducer(reducer, initFormState)
   const { submitForm, response, reset } = useSimulatedSubmitServer()
 
+  if (!!response) {
+    dispatch({ type: 'submit_errors', errors: response })
+    reset()
+  }
+
   const submit = () => {
     const { password } = state
-    reset()
+    console.log('submitting form')
     isValid(state) && submitForm({ password })
   }
 
@@ -141,8 +150,7 @@ export default function App() {
         <button onClick={() => reset()}>Reset</button>
       </p>
       <hr />
-      {!!response && <pre>Server error responses: {JSON.stringify(response)}</pre>}
-      {<pre>form errors: {JSON.stringify(state.errors)}</pre>}
+      {<pre>Form errors: {JSON.stringify(state.errors)}</pre>}
     </div>
   )
 }
